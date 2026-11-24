@@ -73,3 +73,4 @@ public class App {
         System.out.println("Ноутбук в корзине: " + basket.containsProduct("Ноутбук"));
     }
 }
+// 10. Поиск товара по имени в пустой корзине
