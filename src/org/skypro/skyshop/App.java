@@ -1,67 +1,91 @@
 package org.skypro.skyshop;
 
+import org.skypro.skyshop.article.Article;
 import org.skypro.skyshop.basket.ProductBasket;
 import org.skypro.skyshop.product.DiscountedProduct;
 import org.skypro.skyshop.product.FixPriceProduct;
 import org.skypro.skyshop.product.Product;
 import org.skypro.skyshop.product.SimpleProduct;
+import org.skypro.skyshop.search.SearchEngine;
+import org.skypro.skyshop.search.Searchable;
+
+import java.util.Arrays;
 
 public class App {
 
     public static void main(String[] args) {
+        // --- 1. Тестирование корзины (из прошлого ДЗ) ---
         ProductBasket basket = new ProductBasket();
 
-        // 1. Создаем товары разных типов (вместо старого new Product)
         Product p1 = new SimpleProduct("Молоко", 100);
-        Product p2 = new DiscountedProduct("Хлеб", 80, 20); // 80 - 20% = 64
+        Product p2 = new DiscountedProduct("Хлеб", 80, 20);
         Product p3 = new FixPriceProduct("Жвачка");
         Product p4 = new SimpleProduct("Сыр", 300);
-        Product p5 = new DiscountedProduct("Колбаса", 500, 10); // 500 - 10% = 450
-        Product p6 = new SimpleProduct("Масло", 150); // Этот товар не влезет
+        Product p5 = new DiscountedProduct("Колбаса", 500, 10);
+        Product p6 = new SimpleProduct("Масло", 150);
 
-        System.out.println("--- 1. Добавление продуктов в корзину ---");
         basket.addProduct(p1);
         basket.addProduct(p2);
         basket.addProduct(p3);
-        basket.printBasket();
-        System.out.println();
-
-        System.out.println("--- 2. Добавление продукта в заполненную корзину ---");
         basket.addProduct(p4);
         basket.addProduct(p5);
-        basket.addProduct(p6); // Выведет: Невозможно добавить продукт
-        System.out.println();
+        basket.addProduct(p6); // Не добавится, корзина полна
 
-        System.out.println("--- 3. Печать содержимого корзины с несколькими товарами ---");
+        System.out.println("--- Содержимое корзины ---");
         basket.printBasket();
         System.out.println();
 
-        System.out.println("--- 4. Получение стоимости корзины ---");
-        System.out.println("Общая стоимость: " + basket.getTotalPrice());
-        System.out.println();
 
-        System.out.println("--- 5. Поиск товара, который есть в корзине ---");
-        System.out.println("Молоко в корзине: " + basket.containsProduct("Молоко"));
-        System.out.println();
+        // --- 2. Тестирование поискового движка (новое ДЗ) ---
+        System.out.println("--- Тестирование SearchEngine ---");
 
-        System.out.println("--- 6. Поиск товара, которого нет в корзине ---");
-        System.out.println("Шоколад в корзине: " + basket.containsProduct("Шоколад"));
-        System.out.println();
+        // Создаем поисковый движок вместимостью 10 элементов
+        SearchEngine searchEngine = new SearchEngine(10);
 
-        System.out.println("--- 7. Очистка корзины ---");
-        basket.clearBasket();
-        System.out.println("Корзина очищена");
-        System.out.println();
+        // Добавляем товары (они уже реализуют Searchable через абстрактный класс Product)
+        searchEngine.add(p1); // Молоко
+        searchEngine.add(p2); // Хлеб
+        searchEngine.add(p3); // Жвачка
+        searchEngine.add(p4); // Сыр
 
-        System.out.println("--- 8. Печать содержимого пустой корзины ---");
-        basket.printBasket();
-        System.out.println();
+        // Создаем и добавляем статьи
+        Article article1 = new Article("Как выбрать молоко", "Смотрите на жирность и срок годности. Молоко бывает пастеризованным.");
+        Article article2 = new Article("Рецепт бутерброда", "Возьмите хлеб, сыр и колбасу. Это отличный завтрак.");
+        Article article3 = new Article("Польза жвачки", "Жвачка помогает очистить зубы после еды, но не заменяет чистку.");
 
-        System.out.println("--- 9. Получение стоимости пустой корзины ---");
-        System.out.println("Общая стоимость: " + basket.getTotalPrice());
-        System.out.println();
+        searchEngine.add(article1);
+        searchEngine.add(article2);
+        searchEngine.add(article3);
 
-        System.out.println("--- 10. Поиск товара по имени в пустой корзине ---");
-        System.out.println("Молоко в корзине: " + basket.containsProduct("Молоко"));
+        // Демонстрация поиска
+        System.out.println("Поиск по запросу 'молоко':");
+        Searchable[] results1 = searchEngine.search("молоко");
+        printSearchResults(results1);
+
+        System.out.println("\nПоиск по запросу 'хлеб':");
+        Searchable[] results2 = searchEngine.search("хлеб");
+        printSearchResults(results2);
+
+        System.out.println("\nПоиск по запросу 'сыр':");
+        Searchable[] results3 = searchEngine.search("сыр");
+        printSearchResults(results3);
+
+        System.out.println("\nПоиск по запросу 'несуществующий товар':");
+        Searchable[] results4 = searchEngine.search("космический корабль");
+        printSearchResults(results4);
+    }
+
+    // Вспомогательный метод для красивого вывода результатов поиска
+    private static void printSearchResults(Searchable[] results) {
+        // Фильтруем null-элементы для чистого вывода, но показываем, что массив может их содержать
+        for (Searchable item : results) {
+            if (item != null) {
+                System.out.println("Найдено: " + item.getStringRepresentation());
+                // Если нужно вывести полное содержимое для статьи, можно раскомментировать:
+                // System.out.println(item.toString());
+            }
+        }
+        // Альтернативный вывод через Arrays.toString, как в подсказке:
+        // System.out.println(Arrays.toString(results));
     }
 }

@@ -26,3 +26,4 @@ public class DiscountedProduct extends Product {
         return getName() + ": " + getPrice() + " (" + discount + "%)";
     }
 }
+// Вызываем конструктор
