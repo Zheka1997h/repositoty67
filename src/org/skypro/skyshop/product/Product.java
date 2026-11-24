@@ -1,24 +1,20 @@
 package org.skypro.skyshop.product;
 
-public class Product {
-
-    // Поля объявлены как private final - немодифицируемые после создания
+public abstract class Product {
     private final String name;
-    private final int price;
 
-    // Единственный конструктор, принимающий name и price
-    public Product(String name, int price) {
+    public Product(String name) {
         this.name = name;
-        this.price = price;
+        this.name = name;
     }
 
-    // Геттеры для доступа к полям
     public String getName() {
         return name;
     }
 
-    public int getPrice() {
-        return price;
-    }
+    // Поле price удалено, метод стал абстрактным
+    public abstract int getPrice();
+
+    // Новый абстрактный метод для определения, является ли товар специальным
+    public abstract boolean isSpecial();
 }
-// 10. Поиск товара по имени в пустой корзине
